@@ -1,6 +1,7 @@
 package com.dailycoebuffer.OrderService.service;
 
 import com.dailycoebuffer.OrderService.entity.Order;
+import com.dailycoebuffer.OrderService.external.client.ProductService;
 import com.dailycoebuffer.OrderService.model.OrderRequest;
 import com.dailycoebuffer.OrderService.repository.OrderRepository;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +16,9 @@ public class OrderServiceImpl implements OrderService{
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private ProductService productService;
+
     @Override
     public long placeOrder(OrderRequest orderRequest) {
 
@@ -23,6 +27,11 @@ public class OrderServiceImpl implements OrderService{
         //Payment Service -> Payments -> Success -> Complete, else Cancelled
 
         log.info("Placing Order Request: {}", orderRequest);
+
+        productService.reduceQuantity(orderRequest.getProductId(), orderRequest.getQuantity());
+
+        log.info("Creating Order with Status CREATED");
+
         Order order = Order.builder()
                 .amount(orderRequest.getTotalAmount())
                 .orderStatus("CREATED")
