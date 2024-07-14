@@ -1,0 +1,15 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/paymentdb
+    username: root
+    password: vipul
+  jpa:
+    hibernate:
+      ddl-auto: update
+  application:
+    name: PAYMENT-SERVICE
+  config:
+    import: configserver:http://localhost:9296
