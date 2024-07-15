@@ -5,6 +5,7 @@ import com.dailycoebuffer.OrderService.exception.CustomException;
 import com.dailycoebuffer.OrderService.external.client.PaymentService;
 import com.dailycoebuffer.OrderService.external.client.ProductService;
 import com.dailycoebuffer.OrderService.external.request.PaymentRequest;
+import com.dailycoebuffer.OrderService.external.response.PaymentResponse;
 import com.dailycoebuffer.OrderService.model.OrderRequest;
 import com.dailycoebuffer.OrderService.model.OrderResponse;
 import com.dailycoebuffer.OrderService.repository.OrderRepository;
@@ -92,21 +93,21 @@ public class OrderServiceImpl implements OrderService{
         OrderResponse.ProductDetails productDetails = restTemplate.getForObject("http://PRODUCT-SERVICE/product/" + order.getProductId(),
                 OrderResponse.ProductDetails.class);
 
-//        log.info("Getting payment information from the payment service");
-//        OrderResponse.PaymentDetails paymentDetails = restTemplate.getForObject("http://PAYMENTSERVICE/payment/order/"+ order.getId(),
-//                OrderResponse.PaymentDetails.class);
+        log.info("Getting payment information from the payment service");
+        PaymentResponse paymentResponse = restTemplate.getForObject("http://PAYMENTSERVICE/payment/order/"+ order.getId(),
+                PaymentResponse.class);
 
         OrderResponse.ProductDetails productResponse = OrderResponse.ProductDetails.builder()
                 .productName(productDetails.getProductName())
                 .productId(productDetails.getProductId())
                 .build();
 
-//        OrderResponse.PaymentDetails paymentResponse = OrderResponse.PaymentDetails.builder()
-//                .paymentId(paymentDetails.getPaymentId())
-//                .paymentStatus(paymentDetails.getPaymentStatus())
-//                .paymentDate(paymentDetails.getPaymentDate())
-//                .paymentMode(paymentDetails.getPaymentMode())
-//                .build();
+        OrderResponse.PaymentDetails paymentDetails = OrderResponse.PaymentDetails.builder()
+                .paymentId(paymentResponse.getPaymentId())
+                .paymentStatus(paymentResponse.getStatus())
+                .paymentDate(paymentResponse.getPaymentDate())
+                .paymentMode(paymentResponse.getPaymentMode())
+                .build();
 
         OrderResponse orderResponse = OrderResponse.builder()
                 .orderId(order.getId())
@@ -114,6 +115,7 @@ public class OrderServiceImpl implements OrderService{
                 .orderStatus(order.getOrderStatus())
                 .amount(order.getAmount())
                 .productDetails(productResponse)
+                .paymentDetails(paymentDetails)
                 .build();
 
 
