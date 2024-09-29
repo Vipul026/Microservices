@@ -6,6 +6,7 @@ import com.dailycoebuffer.OrderService.external.client.PaymentService;
 import com.dailycoebuffer.OrderService.external.client.ProductService;
 import com.dailycoebuffer.OrderService.external.request.PaymentRequest;
 import com.dailycoebuffer.OrderService.external.response.PaymentResponse;
+import com.dailycoebuffer.OrderService.external.response.ProductResponse;
 import com.dailycoebuffer.OrderService.model.OrderRequest;
 import com.dailycoebuffer.OrderService.model.OrderResponse;
 import com.dailycoebuffer.OrderService.repository.OrderRepository;
@@ -90,16 +91,16 @@ public class OrderServiceImpl implements OrderService{
                         404));
 
         log.info("Invoking Product Service to fetch the product for id {}", order.getProductId());
-        OrderResponse.ProductDetails productDetails = restTemplate.getForObject("http://PRODUCT-SERVICE/product/" + order.getProductId(),
-                OrderResponse.ProductDetails.class);
+        ProductResponse productResponse = restTemplate.getForObject("http://PRODUCT-SERVICE/product/" + order.getProductId(),
+                ProductResponse.class);
 
         log.info("Getting payment information from the payment service");
         PaymentResponse paymentResponse = restTemplate.getForObject("http://PAYMENTSERVICE/payment/order/"+ order.getId(),
                 PaymentResponse.class);
 
-        OrderResponse.ProductDetails productResponse = OrderResponse.ProductDetails.builder()
-                .productName(productDetails.getProductName())
-                .productId(productDetails.getProductId())
+        OrderResponse.ProductDetails productDetails = OrderResponse.ProductDetails.builder()
+                .productName(productResponse.getProductName())
+                .productId(productResponse.getProductId())
                 .build();
 
         OrderResponse.PaymentDetails paymentDetails = OrderResponse.PaymentDetails.builder()
@@ -114,7 +115,7 @@ public class OrderServiceImpl implements OrderService{
                 .orderDate(order.getOrderDate())
                 .orderStatus(order.getOrderStatus())
                 .amount(order.getAmount())
-                .productDetails(productResponse)
+                .productDetails(productDetails)
                 .paymentDetails(paymentDetails)
                 .build();
 
